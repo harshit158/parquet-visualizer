@@ -30,9 +30,12 @@ if uploaded_file:
     
     for object in objects:
         new_dict = {}
-        if 'lanes' in object and object['lanes']:
+        if ('lanes' in object and object['lanes']) and \
+            'module_temperature' in object and \
+            object['model_type'] == 'LR4':
+                
+            new_dict['name'] = object['name']
             new_dict['lanes'] = object['lanes']
-        if 'module_temperature' in object and object['module_temperature']:
             new_dict['module_temperature'] = object['module_temperature']
         
         if new_dict:
