@@ -32,9 +32,11 @@ if uploaded_file:
         new_dict = {}
         if 'lanes' in object and object['lanes']:
             new_dict['lanes'] = object['lanes']
-        if 'module_temperature' in object:
+        if 'module_temperature' in object and object['module_temperature']:
             new_dict['module_temperature'] = object['module_temperature']
-        filtered_objects.append(new_dict)
+        
+        if new_dict:
+            filtered_objects.append(new_dict)
             
     st.write(filtered_objects)
     
