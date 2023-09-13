@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import json
 import subprocess
+from pprint import pprint
 import re
 
 # Title and instructions
@@ -18,28 +19,42 @@ def parquet_to_json(parquet_filename):
 
 if uploaded_file:
     # Load the Parquet file into a DataFrame
-    json_obj = parquet_to_json(uploaded_file)
-    
+    df, json_obj = parquet_to_json(uploaded_file)
+
     # Display the DataFrame
     st.write("Preview of the Parquet file contents:")
     
-    # st.write(json_obj)
-    # print(json_obj[1])
-    objects = sum(json_obj[1]['interfaces'].values(), [])
-    filtered_objects = []
+    # Extracting org_ids and interface_values
+    org_ids = list(json_obj['org_id'].values())
+    interface_values_per_org = list(json_obj['interfaces'].values())
+    assert len(org_ids) == len(interface_values_per_org), 'number of org_ids does not match with number of interfaces'
     
-    for object in objects:
-        new_dict = {}
-        if ('lanes' in object and object['lanes']) and \
-            'module_temperature' in object and \
-            object['model_type'] == 'LR4':
-                
-            new_dict['name'] = object['name']
-            new_dict['lanes'] = object['lanes']
-            new_dict['module_temperature'] = object['module_temperature']
+    # Manually adding org_id for Ultron
+    if '3b1220d1-cae3-4075-baad-171e09aa9a6e' not in org_ids:
+        org_ids += ['3b1220d1-cae3-4075-baad-171e09aa9a6e']
         
-        if new_dict:
-            filtered_objects.append(new_dict)
+    options = st.multiselect(
+                'Select ORG_ID',
+                list(set(org_ids)),
+                '3b1220d1-cae3-4075-baad-171e09aa9a6e')
+    
+    filtered_objects = []
+    for org_id, interface_values in zip(org_ids, interface_values_per_org):
+        if options and org_id not in options:
+            continue
+        for interface_value in interface_values:
+            new_dict = {}
+            if ('lanes' in interface_value and interface_value['lanes']) and \
+                'module_temperature' in interface_value and \
+                interface_value['model_type'] == 'LR4':
+                
+                new_dict['org_id'] = org_id
+                new_dict['name'] = interface_value['name']
+                new_dict['lanes'] = interface_value['lanes']
+                new_dict['module_temperature'] = interface_value['module_temperature']
+            
+            if new_dict:
+                filtered_objects.append(new_dict)
             
     st.write(filtered_objects)
     
