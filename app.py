@@ -49,8 +49,9 @@ if uploaded_file:
                 interface_value['model_type'] == 'LR4':
                 
                 new_dict['org_id'] = org_id
-                new_dict['link'] = interface_value['link'] 
                 new_dict['name'] = interface_value['name']
+                new_dict['link'] = interface_value['link']
+                new_dict['model_type'] = interface_value['model_type']
                 new_dict['lanes'] = interface_value['lanes']
                 new_dict['module_temperature'] = interface_value['module_temperature']
             
